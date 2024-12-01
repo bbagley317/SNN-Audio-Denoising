@@ -7,12 +7,12 @@ import matplotlib.pyplot as plt
 import os
 import random 
 
-sample_rate = 44100
+sample_rate = 48000
 clean_audio_dir = "./all_audio/clean_audio"
 noise_audio_dir = "./all_audio/noisy_audio"
-num_processed_files = 150
-clean_audio_files = sorted(os.listdir(clean_audio_dir))[:num_processed_files]  
-noise_audio_files = sorted(os.listdir(noise_audio_dir))[:num_processed_files]  
+num_processed_files = 20
+clean_audio_files = os.listdir(clean_audio_dir)[:num_processed_files]  
+noise_audio_files = os.listdir(noise_audio_dir)[:num_processed_files]  
 #noise_audio_files = os.listdir(noise_audio_dir) 
 
 def spec_subtraction(clean_audio_path, noise_audio_path, noise_scaling_factor=1):
@@ -32,7 +32,7 @@ def spec_subtraction(clean_audio_path, noise_audio_path, noise_scaling_factor=1)
 
     # Denoise the combined audio using the noisereduce library
     denoised_audio = nr.reduce_noise(y=combined_audio, sr=sample_rate)
-    #sf.write("denoised_audio.wav", denoised_audio, sample_rate)
+    sf.write(f"./noise_reduce/denoised_audio.wav", denoised_audio, sample_rate)
 
     # Convert clean and denoised audio into spectrograms Short-Time Fourier Transform (STFT) for evaluation
     # These are complex spectrograms that include both magnitude and phase

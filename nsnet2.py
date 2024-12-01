@@ -15,14 +15,6 @@ from pydub import AudioSegment
 
 # Also I had to resample the audio files to be at a sampling rate of 48000, rather than 44100 for now
 
-# ADJUST FOR YOUR PERSONAL DIRECTORY
-nsnet2_model_path = "C:/Users/B/WPI/Graduate/CS 541 Deep Learning/DNS-Challenge/NSNet2-baseline/nsnet2-20ms-48k-baseline.onnx"
-denoised_suffix = "nsnet2-20ms-48k-baseline"
-
-# Where I locally stored the clean / noise audio files 
-clean_audio_dir = "./all_audio/clean_audio"
-noise_audio_dir = "./all_audio/noisy_audio"
-
 def calculate_snr(clean_audio, denoised_audio):
     """
     Calculate Signal-to-Noise Ratio (SNR) in dB.
@@ -51,7 +43,7 @@ def nsnet2(combined_audio_file_path, output_dir="./denoised_audio"):
     denoised_path = os.path.join(output_dir)
     os.makedirs(output_dir, exist_ok=True)
 
-    # Example command to run the NSNet2 model
+    # Command to run the NSNet2 model
     command_list = [
         "python",
         "c:/Users/B/WPI/Graduate/CS 541 Deep Learning/DNS-Challenge/NSNet2-baseline/run_nsnet2.py",
@@ -66,22 +58,26 @@ def nsnet2(combined_audio_file_path, output_dir="./denoised_audio"):
     denoised_file_name = f"{combined_file_name[:-4]}_{denoised_suffix}.wav"
     return os.path.join(denoised_path, denoised_file_name)
 
-# Main loop for processing files and denoising
+# ADJUST FOR YOUR PERSONAL DIRECTORY
+nsnet2_model_path = "C:/Users/B/WPI/Graduate/CS 541 Deep Learning/DNS-Challenge/NSNet2-baseline/nsnet2-20ms-48k-baseline.onnx"
+denoised_suffix = "nsnet2-20ms-48k-baseline"
+clean_audio_dir = "./all_audio/clean_audio"
+noise_audio_dir = "./all_audio/noisy_audio"
+
 sample_rate = 48000
 num_processed_files = 10
 clean_audio_files = sorted(os.listdir(clean_audio_dir))[:num_processed_files]
 noise_audio_files = sorted(os.listdir(noise_audio_dir))[:num_processed_files]
-#noise_audio_files = os.listdir(noise_audio_dir)
 
 # Paths of clean, combined, and denoised files
 combined_paths = []
 denoised_paths = []
 clean_paths = []
 
+# Main loop for processing files and denoising
 for clean_file, noise_file in zip(clean_audio_files, noise_audio_files):
     clean_path = os.path.join(clean_audio_dir, clean_file)
     noise_path = os.path.join(noise_audio_dir, noise_file)
-
     #noise_file = random.choice(noise_audio_files)  # Randomly select a noise file
     #noise_path = os.path.join(noise_audio_dir, noise_file)
 
@@ -89,21 +85,15 @@ for clean_file, noise_file in zip(clean_audio_files, noise_audio_files):
     clean_audio = AudioSegment.from_file(clean_path)
     noise_audio = AudioSegment.from_file(noise_path)
 
-    # Ensure both audio files have the same frame rate and number of channels
-    if clean_audio.frame_rate != noise_audio.frame_rate:
-        noise_audio = noise_audio.set_frame_rate(clean_audio.frame_rate)
-    if clean_audio.channels != noise_audio.channels:
-        noise_audio = noise_audio.set_channels(clean_audio.channels)
-
-    # Truncate or pad to match durations
+    # Ensure both audio files have the same frame rate, number of channels, and duration
+    if clean_audio.frame_rate != noise_audio.frame_rate: noise_audio = noise_audio.set_frame_rate(clean_audio.frame_rate)
+    if clean_audio.channels != noise_audio.channels: noise_audio = noise_audio.set_channels(clean_audio.channels)
     min_duration = min(len(clean_audio), len(noise_audio))
     clean_audio = clean_audio[:min_duration]
     noise_audio = noise_audio[:min_duration]
 
-    # Combine the audio files (mix them)
+    # Combine the audio files / Resample to 48000 Hz 
     combined_audio = clean_audio.overlay(noise_audio)
-
-    # Resample to 48000 Hz
     combined_audio = combined_audio.set_frame_rate(48000)
 
     # Save combined audio for NSNet2 input
