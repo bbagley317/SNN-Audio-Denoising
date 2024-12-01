@@ -12,9 +12,10 @@ clean_audio_dir = "./all_audio/clean_audio"
 noise_audio_dir = "./all_audio/noisy_audio"
 num_processed_files = 150
 clean_audio_files = sorted(os.listdir(clean_audio_dir))[:num_processed_files]  
-noise_audio_files = os.listdir(noise_audio_dir) 
+noise_audio_files = sorted(os.listdir(noise_audio_dir))[:num_processed_files]  
+#noise_audio_files = os.listdir(noise_audio_dir) 
 
-def spec_subtraction(clean_audio_path, noise_audio_path, noise_scaling_factor=0.02):
+def spec_subtraction(clean_audio_path, noise_audio_path, noise_scaling_factor=1):
     # Load the clean and noise audio files 
     clean_audio, sr_clean = librosa.load(clean_audio_path, sr=sample_rate)  
     noise_audio, sr_noise = librosa.load(noise_audio_path, sr=sample_rate) 
@@ -80,10 +81,12 @@ def spec_subtraction(clean_audio_path, noise_audio_path, noise_scaling_factor=0.
 # Calculates average Signal to Noise Ratio
 # Commented out lines in spec_subtraction function to visualize spectrograms and output denoised audio files
 total_snr = 0
-for clean_file in clean_audio_files:
+for clean_file, noise_file in zip(clean_audio_files, noise_audio_files):
     clean_path = os.path.join(clean_audio_dir, clean_file)
-    noise_file = random.choice(noise_audio_files)  # Randomly select a noise file
     noise_path = os.path.join(noise_audio_dir, noise_file)
+
+    #noise_file = random.choice(noise_audio_files)  # Randomly select a noise file
+    #noise_path = os.path.join(noise_audio_dir, noise_file)
 
     print(f"Processing: Clean: {clean_file}, Noise: {noise_file}")
     snr = spec_subtraction(clean_path, noise_path)
