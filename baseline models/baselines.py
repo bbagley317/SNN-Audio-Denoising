@@ -16,7 +16,7 @@ noise_audio_dir = "./all_audio/noisy_audio"
 clean_audio_files = os.listdir(clean_audio_dir)[:num_processed_files]  
 noise_audio_files = os.listdir(noise_audio_dir)[:num_processed_files]  
 
-nsnet2_model_path = "C:/Users/B/WPI/Graduate/CS 541 Deep Learning/DNS-Challenge/NSNet2-baseline/nsnet2-20ms-48k-baseline.onnx"
+nsnet2_model_path = "....../DNS-Challenge/NSNet2-baseline/nsnet2-20ms-48k-baseline.onnx"
 denoised_suffix = "nsnet2-20ms-48k-baseline"
 
 os.makedirs("./denoised_ss", exist_ok=True)
